@@ -1,19 +1,21 @@
 import {products} from "./main.js"
 
-
-
 function formatPrice(price) {
     return price.toLocaleString('uz-UZ') + " so'm";
 }
 
-
-
 let box = document.getElementById("box")
 let search = document.querySelector("#search");
+let divHidden = document.querySelector("#divHidden");
 
-products.forEach((item) => {
-    let div = document.createElement("div");
-    div.innerHTML = `
+let radio_category = document.querySelectorAll("input[name='category']"); // yoki boshqa selector
+
+function renderCategory(products) {
+    box.innerHTML = '';
+
+    products.forEach((item) => {
+        let div = document.createElement("div");
+        div.innerHTML = `
          <div class="group bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden animate-pulse-slow" >
                   
                     <div class="absolute top-4 left-4 z-10">
@@ -58,9 +60,37 @@ products.forEach((item) => {
                     <div class="absolute inset-0 rounded-3xl bg-gradient-to-r ${item.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none"></div>
                 </div>
     `
-    box.appendChild(div)
-})
+        box.appendChild(div)
+    })
+}
+
+renderCategory(products)
 
 search.addEventListener("input", e => {
-    console.log(search.value)
+    let filterSearch = products.filter(item => {
+        return item.name.toLowerCase().includes(e.target.value.toLowerCase())
+    })
+    divHidden.classList.remove("hidden")
+    if (search.value.length === 0) {
+        divHidden.classList.add("hidden")
+    }
+
+    divHidden.innerHTML = '';
+    filterSearch.forEach(filter => {
+        let div = document.createElement("div");
+        div.innerHTML = `
+        <p class="p-4 hover:bg-blue-600 hover:text-[#fff]">${filter.name}</p>
+        `
+        divHidden.appendChild(div)
+    })
 })
+
+radio_category.forEach((item) => {
+    item.addEventListener("change", (e) => {
+        let filter_product = products.filter(filter => {
+            return filter.category.toLowerCase() === e.target.value.toLowerCase();
+        })
+        renderCategory(filter_product)
+    })
+})
+
